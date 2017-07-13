@@ -65,6 +65,7 @@ public class PercentBasedCuckooHash<K> {
 	
 	private boolean insertToTableOne(int key, Node<K> n, int count, K data){
 		if(count > maxRoundLoops){// && data.equals(n.data)){
+			//System.out.println("data:"+data+" key:"+key);
 			return false;
 		}else if(arr1[key] == null){
 			arr1[key] = n;
@@ -80,6 +81,7 @@ public class PercentBasedCuckooHash<K> {
 	
 	private boolean insertToTableTwo(int key, Node<K> n, int count, K data){
 		if(count > maxRoundLoops){// && data.equals(n.data)){
+			//System.out.println("data:"+data+" key:"+key);
 			return false;
 		}else if(arr2[key] == null){
 			arr2[key] = n;
@@ -120,17 +122,18 @@ public class PercentBasedCuckooHash<K> {
 	private int hash2(K data){
 		int key = 0;
 		int hash = data.hashCode();
+		hash = hash & 0xf7777777;
 		int modified = 0;
 		int count = 0;
 		while (hash != 0){
 			count ++;
 			int remainder = hash%7;
 			hash = hash/7;
-			remainder *= count;
+			remainder *= (count*7 + 29);
 			//remainder += (7* (count/2)); 
-			modified += (remainder * 11);
+			modified += (remainder * 127);
 		}
-		key = ((modified & 0xf7777777)) % (capacity);
+		key = ((modified)) % (capacity);
 		return key;
 	}
 	

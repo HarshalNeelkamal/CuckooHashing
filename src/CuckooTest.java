@@ -36,7 +36,7 @@ public class CuckooTest {
 		int arraySize = 5000;
 		int insertions = 0;
 		int capacity = 100;
-		int maxRoundLoops = 100;
+		int maxRoundLoops = 101;
 		long timeTaken[][] = new long[9][5];
 		long memTaken[][] = new long[9][5];
 		for(int i = 0; i < 5; i ++){
@@ -52,12 +52,17 @@ public class CuckooTest {
 						insertions++;
 						totalTime += time;
 					}
-					if(insertions == 1000)
+					if(insertions == 1000){
+						//System.out.println("total: "+j);
 						break;
+					}else if(j == newArr.length - 1){
+						System.out.println("insertions for"+percentage+"% :"+ hash.size()+"  "+j);
+					}
 				}
 				memTaken[percentage/10 - 1][i] = hash.avgMemoryUsagePerInsertion();
 				timeTaken[percentage/10 - 1][i] = totalTime;
 				percentage += 10;
+				insertions = 0;
 			}
 		}
 		for(int i = 0; i < timeTaken.length; i++){
@@ -83,7 +88,7 @@ public class CuckooTest {
 			int newArr[] = prepareRandomIntegerArray(arraySize);
 			int percentage = 10;
 			while(percentage < 91){
-				SecondHash<Integer> hash = new SecondHash<Integer>(capacity, maxRoundLoops, percentage, 21);
+				SecondHash<Integer> hash = new SecondHash<Integer>(capacity, maxRoundLoops, percentage, 9);
 				long totalTime = 0;
 				for(int j =0 ; j < newArr.length; j++){
 					long time = System.nanoTime();
@@ -93,16 +98,17 @@ public class CuckooTest {
 						totalTime += time;
 					}
 					if(insertions == 1000){
-						System.out.println("total: "+j);
+						//System.out.println("total: "+j);
 						break;
 					}else if(j == newArr.length - 1){
-						System.out.println("insertions:"+ hash.size()+"  "+j);
+						System.out.println("insertions for"+percentage+"% :"+ hash.size()+"  "+j);
 					}
 				}
 				memTaken[percentage/10 - 1][i] = hash.avgMemoryUsagePerInsertion();
 				timeTaken[percentage/10 - 1][i] = totalTime;
 				percentage += 10;
 				hash = null;
+				insertions = 0;
 			}
 		}
 		for(int i = 0; i < timeTaken.length; i++){
@@ -150,8 +156,8 @@ public class CuckooTest {
 	
 	public static void main(String args[]){
 		CuckooTest test = new CuckooTest();
-		//test.run();
-		//test.percentBreakPointRun();
+		test.run();
+		test.percentBreakPointRun();
 		test.DynamicPointRun();
 	}
 }

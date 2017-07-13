@@ -106,31 +106,33 @@ public class SecondHash<K>{
 			break;
 		case 1:
 			int hash = data.hashCode();
+			hash = hash &  0xf7777777;
 			int modified = 0;
 			int count = 0;
 			while (hash != 0){
 				count ++;
 				int remainder = hash%7;
 				hash = hash/7;
-				remainder *= count;
+				remainder *= (count*7 + 11*degree);
 				//remainder += (7* (count/2)); 
-				modified += (remainder * 11);
+				modified += (remainder * 127);
 			}
-			key = ((modified & 0xf7777777))*degree % (capacity);
+			key = ((modified))*degree % (capacity);
 			break;
 		case 2:
 			hash = data.hashCode();
+			hash = hash & 0xf7777777;
 			modified = 0;
 			count = 0;
 			while (hash != 0){
 				count ++;
 				int remainder = hash%7;
 				hash = hash/7;
-				remainder *= (degree^count + degree);
+				remainder *= (degree^count + degree*29);
 				//remainder += (7* (count/2)); 
-				modified += (remainder * 11);
+				modified += (remainder * 371);
 			}
-			key = ((modified & 0xf7777777)) % (capacity);
+			key = ((modified)) % (capacity);
 			break;
 		}
 		return key;
