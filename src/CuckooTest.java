@@ -72,6 +72,51 @@ public class CuckooTest {
 		}
 	}
 	
+	public void DynamicPointRun(){
+		int arraySize = 5000;
+		int insertions = 0;
+		int capacity = 100;
+		int maxRoundLoops = 100;
+		long timeTaken[][] = new long[9][5];
+		long memTaken[][] = new long[9][5];
+		for(int i = 0; i < 5; i ++){
+			int newArr[] = prepareRandomIntegerArray(arraySize);
+			int percentage = 10;
+			while(percentage < 91){
+				SecondHash<Integer> hash = new SecondHash<Integer>(capacity, maxRoundLoops, percentage, 21);
+				long totalTime = 0;
+				for(int j =0 ; j < newArr.length; j++){
+					long time = System.nanoTime();
+					if(hash.put(newArr[j])){
+						time = System.nanoTime() - time;
+						insertions++;
+						totalTime += time;
+					}
+					if(insertions == 1000){
+						System.out.println("total: "+j);
+						break;
+					}else if(j == newArr.length - 1){
+						System.out.println("insertions:"+ hash.size()+"  "+j);
+					}
+				}
+				memTaken[percentage/10 - 1][i] = hash.avgMemoryUsagePerInsertion();
+				timeTaken[percentage/10 - 1][i] = totalTime;
+				percentage += 10;
+				hash = null;
+			}
+		}
+		for(int i = 0; i < timeTaken.length; i++){
+			int time = 0;
+			int mem = 0;
+			for(int j = 0; j < timeTaken[i].length; j++){
+				time += timeTaken[i][j];
+				mem += memTaken[i][j];
+			}
+			System.out.println("Avg Time at max Capacity "+(i+1)*10+": "+time/5000000.0+" ms");
+			System.out.println("Avg Memory cost per Insertion : "+mem/5);
+		}
+	}
+	
 	public String[] prepareRandomStringArray(int size){
 		String arr[] = new String[size];
 		for(int i = 0; i < arr.length; i++){
@@ -89,6 +134,8 @@ public class CuckooTest {
 		return arr;
 	}
 	
+	
+	
 	public String getRandomString(){
 		String returnable = "";
 		Random rand = new Random();
@@ -104,6 +151,7 @@ public class CuckooTest {
 	public static void main(String args[]){
 		CuckooTest test = new CuckooTest();
 		//test.run();
-		test.percentBreakPointRun();
+		//test.percentBreakPointRun();
+		test.DynamicPointRun();
 	}
 }
