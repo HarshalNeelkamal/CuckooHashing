@@ -38,7 +38,6 @@ public class CuckooHash<K> {
 	}
 	
 	public void put(K data){
-		memory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
 		Node<K> newNode = new Node<K>(data);
 		int key1 = hash1(data);
 		int key2 = hash2(data);
@@ -48,9 +47,9 @@ public class CuckooHash<K> {
 			return;
 			
 		}else{
+			memory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
 			if(insertToTableOne(key1, newNode, 0, newNode.data)){
 				size++;
-				memory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory() - memory; 
 				//System.out.println("out:"+memory);
 				cumelativeMemory += memory;
 			}
@@ -66,6 +65,7 @@ public class CuckooHash<K> {
 			//System.out.println("in:"+(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory() - memory));
 			//memory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory() - memory; 
 			//cumelativeMemory += memory;
+			memory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory() - memory; 
 			return true;
 		}else{
 			Node<K> temp = arr1[key];
@@ -85,6 +85,7 @@ public class CuckooHash<K> {
 			//System.out.println("in:"+(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory() - memory));
 			//memory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory() - memory; 
 			//cumelativeMemory += memory; 
+			memory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory() - memory; 
 			return true;
 		}else{
 			Node<K> temp = arr2[key];

@@ -40,7 +40,6 @@ public class PercentBasedCuckooHash<K> {
 	}
 	
 	public boolean put(K data){
-		memory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
 		Node<K> newNode = new Node<K>(data);
 		int key1 = hash1(data);
 		int key2 = hash2(data);
@@ -50,12 +49,12 @@ public class PercentBasedCuckooHash<K> {
 			return false;
 			
 		}else{
+			memory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
 			if((size/capacity)*100 > percentFull){
 				maxLoopsStuck();
 			}
 			if(insertToTableOne(key1, newNode, 0, newNode.data)){
 				size++;
-				memory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory() - memory; 
 				cumelativeMemory += memory;
 				return true;
 			}
@@ -69,6 +68,7 @@ public class PercentBasedCuckooHash<K> {
 			return false;
 		}else if(arr1[key] == null){
 			arr1[key] = n;
+			memory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory() - memory; 
 			return true;
 		}else{
 			Node<K> temp = arr1[key];
@@ -85,6 +85,7 @@ public class PercentBasedCuckooHash<K> {
 			return false;
 		}else if(arr2[key] == null){
 			arr2[key] = n;
+			memory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory() - memory; 
 			return true;
 		}else{
 			Node<K> temp = arr2[key];

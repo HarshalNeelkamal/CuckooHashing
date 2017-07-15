@@ -55,7 +55,6 @@ public class SecondHash<K>{
 		}
 		if(insertToTable(hash(data,0), newNode, 0, newNode.data, 0)){
 			size++;
-			memory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory() - memory; 
 			cumelativeMemory += memory;
 			return true;
 		}
@@ -68,6 +67,7 @@ public class SecondHash<K>{
 			return false;
 		}else if(hashArr[D][key] == null){
 			hashArr[D][key] = n;
+			memory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory() - memory; 
 			return true;
 		}else{
 			Node<K> temp = hashArr[D][key];

@@ -1,3 +1,4 @@
+import java.text.DecimalFormat;
 import java.util.Random;
 
 public class CuckooTest {
@@ -8,6 +9,8 @@ public class CuckooTest {
 		int capacity = 10;
 		int maxRoundLoops = 10;
 		int arr[] = prepareRandomIntegerArray(size);
+		System.out.println("\n*************inserting "+size+" elements without skipping*************\n");
+		System.out.println(String.format("%-20s%-20s%-20s%-20s","Deep","Insertion Time","Load Factor","Memory Cost"));
 		while(maxRoundLoops < 101){
 			double millitime = 0;
 			double loadFactor = 0;
@@ -26,9 +29,11 @@ public class CuckooTest {
 				memoryCost = memoryCost + hash.avgMemoryUsagePerInsertion();
 				hash = null;
 			}
-			System.out.println("____________________________________\nStart Capacity: "+ capacity+"\nFinal Capacity: "+hashCapacity/10+"\nMax Round-loops: "+maxRoundLoops+"\ntime for "+size+" insertions: "+(millitime/10.0)+" ms\nLoad Factor: "+loadFactor/10+"\nMemory cost per insertion: "+memoryCost/10+"\n____________________________________\n");
-			//capacity += 10;
-			maxRoundLoops += 2;
+			//\nStart Capacity: "+ capacity+"\nFinal Capacity: "+hashCapacity/10+"
+			DecimalFormat df = new DecimalFormat();
+			df.setMaximumFractionDigits(3);
+			System.out.println(String.format("%-20s%-20s%-20s%-20s",""+maxRoundLoops,""+df.format(millitime/(10.0))+" ms ",""+df.format(loadFactor/10),""+df.format(memoryCost/(10*1024*1024.0))+" MBs"));
+			maxRoundLoops += 10;
 		}
 	}
 	
@@ -37,11 +42,15 @@ public class CuckooTest {
 		int insertions = 0;
 		int capacity = 100;
 		int maxRoundLoops = 101;
-		long timeTaken[][] = new long[9][5];
-		long memTaken[][] = new long[9][5];
-		for(int i = 0; i < 5; i ++){
+		int repetations = 5;
+		int increment = 10;
+		long timeTaken[][] = new long[90/increment][repetations];
+		long memTaken[][] = new long[90/increment][repetations];
+		System.out.println("\n*************Deep Assumed: "+maxRoundLoops+"*************\n");
+		System.out.println(String.format("%-20s%-20s%-20s","Max Capacity","Insertion Time","Memory Cost"));
+		for(int i = 0; i < repetations; i ++){
 			int newArr[] = prepareRandomIntegerArray(arraySize);
-			int percentage = 10;
+			int percentage = increment;
 			while(percentage < 91){
 				PercentBasedCuckooHash<Integer> hash = new PercentBasedCuckooHash<Integer>(capacity, maxRoundLoops, percentage);
 				long totalTime = 0;
@@ -59,9 +68,9 @@ public class CuckooTest {
 						System.out.println("insertions for"+percentage+"% :"+ hash.size()+"  "+j);
 					}
 				}
-				memTaken[percentage/10 - 1][i] = hash.avgMemoryUsagePerInsertion();
-				timeTaken[percentage/10 - 1][i] = totalTime;
-				percentage += 10;
+				memTaken[percentage/increment - 1][i] = hash.avgMemoryUsagePerInsertion();
+				timeTaken[percentage/increment - 1][i] = totalTime;
+				percentage += increment;
 				insertions = 0;
 			}
 		}
@@ -72,8 +81,9 @@ public class CuckooTest {
 				time += timeTaken[i][j];
 				mem += memTaken[i][j];
 			}
-			System.out.println("Avg Time at max Capacity "+(i+1)*10+": "+time/5000000.0+" ms");
-			System.out.println("Avg Memory cost per Insertion : "+mem/5);
+			DecimalFormat df = new DecimalFormat();
+			df.setMaximumFractionDigits(3);
+			System.out.println(String.format("%-20s%-20s%-20s",""+(i+1)*increment,""+df.format(time/(repetations*1000000.0))+" ms ",""+df.format(mem/(repetations*1024*1024.0))+" MBs"));
 		}
 	}
 	
@@ -82,13 +92,18 @@ public class CuckooTest {
 		int insertions = 0;
 		int capacity = 100;
 		int maxRoundLoops = 100;
-		long timeTaken[][] = new long[9][5];
-		long memTaken[][] = new long[9][5];
-		for(int i = 0; i < 5; i ++){
+		int degree = 7;
+		int repetations = 5;
+		int increment = 10;
+		long timeTaken[][] = new long[90/increment][repetations];
+		long memTaken[][] = new long[90/increment][repetations];
+		System.out.println("\n*************Deep Assumed: "+maxRoundLoops+" & Degree = "+degree+"*************\n");
+		System.out.println(String.format("%-20s%-20s%-20s","Max Capacity","Insertion Time","Memory Cost"));
+		for(int i = 0; i < repetations; i ++){
 			int newArr[] = prepareRandomIntegerArray(arraySize);
-			int percentage = 10;
+			int percentage = increment;
 			while(percentage < 91){
-				SecondHash<Integer> hash = new SecondHash<Integer>(capacity, maxRoundLoops, percentage, 9);
+				SecondHash<Integer> hash = new SecondHash<Integer>(capacity, maxRoundLoops, percentage, degree);
 				long totalTime = 0;
 				for(int j =0 ; j < newArr.length; j++){
 					long time = System.nanoTime();
@@ -106,7 +121,7 @@ public class CuckooTest {
 				}
 				memTaken[percentage/10 - 1][i] = hash.avgMemoryUsagePerInsertion();
 				timeTaken[percentage/10 - 1][i] = totalTime;
-				percentage += 10;
+				percentage += increment;
 				hash = null;
 				insertions = 0;
 			}
@@ -118,8 +133,11 @@ public class CuckooTest {
 				time += timeTaken[i][j];
 				mem += memTaken[i][j];
 			}
-			System.out.println("Avg Time at max Capacity "+(i+1)*10+": "+time/5000000.0+" ms");
-			System.out.println("Avg Memory cost per Insertion : "+mem/5);
+//			System.out.println("Avg Time at max Capacity "+(i+1)*10+": "+time/5000000.0+" ms");
+//			System.out.println("Avg Memory cost per Insertion : "+mem/5);
+			DecimalFormat df = new DecimalFormat();
+			df.setMaximumFractionDigits(3);
+			System.out.println(String.format("%-20s%-20s%-20s",""+(i+1)*increment,""+df.format(time/(repetations*1000000.0))+" ms ",""+df.format(mem/(repetations*1024*1024.0))+" MBs"));
 		}
 	}
 	
@@ -157,7 +175,9 @@ public class CuckooTest {
 	public static void main(String args[]){
 		CuckooTest test = new CuckooTest();
 		test.run();
+		System.out.println(String.format("======================================================================="));
 		test.percentBreakPointRun();
+		System.out.println(String.format("======================================================================="));
 		test.DynamicPointRun();
 	}
 }
