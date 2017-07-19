@@ -1,9 +1,11 @@
 import java.text.DecimalFormat;
+import java.util.InputMismatchException;
 import java.util.Random;
+import java.util.Scanner;
 
 public class CuckooTest {
 	
-	int size = 500;
+	int size = 400;
 	
 	public void run(){
 		int capacity = 10;
@@ -87,12 +89,11 @@ public class CuckooTest {
 		}
 	}
 	
-	public void DynamicPointRun(){
+	public void DynamicPointRun(int degree){
 		int arraySize = 5000;
 		int insertions = 0;
 		int capacity = 100;
 		int maxRoundLoops = 100;
-		int degree = 7;
 		int repetations = 5;
 		int increment = 10;
 		long timeTaken[][] = new long[90/increment][repetations];
@@ -170,7 +171,28 @@ public class CuckooTest {
 		return returnable;
 	}
 	
-	
+	public void userRunProgram(){
+		while(true){
+			System.out.println("Enter the No. of tables you want to implement cuckoo hash with(enter -1 to quit):");
+			Scanner s = new Scanner(System.in);
+			int degree = -1;
+			try{
+				degree = s.nextInt();
+			}catch (InputMismatchException e) {
+				System.out.println("Please enter a no greater then or equal to \"2\" ");
+				continue;
+			}
+			if(degree < 2){
+				if(degree == -1){
+					break;
+				}
+				System.out.println("Please enter a no greater then or equal to \"2\" ");
+				continue;
+			}
+			DynamicPointRun(degree);
+			
+		}
+	}
 	
 	public static void main(String args[]){
 		CuckooTest test = new CuckooTest();
@@ -178,6 +200,6 @@ public class CuckooTest {
 		System.out.println(String.format("======================================================================="));
 		test.percentBreakPointRun();
 		System.out.println(String.format("======================================================================="));
-		test.DynamicPointRun();
+		test.userRunProgram();
 	}
 }

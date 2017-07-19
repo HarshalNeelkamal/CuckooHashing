@@ -24,7 +24,8 @@ public class SecondHash<K>{
 	long memory = 0;
 	long cumelativeMemory = 0;
 	int degree = 0;
-	
+	K incomingElement = null;
+
 	public int getCapacity() {
 		return capacity;
 	}
@@ -41,6 +42,7 @@ public class SecondHash<K>{
 	}
 	
 	public boolean put(K data){
+		incomingElement = data;
 		memory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
 		Node<K> newNode = new Node<K>(data);
 		int key = 0;
@@ -50,7 +52,7 @@ public class SecondHash<K>{
 				return false;	
 			}
 		}
-		if((size/capacity)*100 > percentFull){
+		if((size/(capacity*1.0*degree))*100 > percentFull){
 			maxLoopsStuck();
 		}
 		if(insertToTable(hash(data,0), newNode, 0, newNode.data, 0)){
@@ -64,6 +66,10 @@ public class SecondHash<K>{
 	
 	private boolean insertToTable(int key, Node<K> n, int count, K data, int D){
 		if(count > maxRoundLoops){
+			int hash = hash(incomingElement,0);
+			hashArr[0][hash] = null;
+			size--;
+			put(data);
 			return false;
 		}else if(hashArr[D][key] == null){
 			hashArr[D][key] = n;

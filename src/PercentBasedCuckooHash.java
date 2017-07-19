@@ -24,6 +24,7 @@ public class PercentBasedCuckooHash<K> {
 	int append = 0;
 	long memory = 0;
 	long cumelativeMemory = 0;
+	K incomingElement = null;
 	
 	public int getCapacity() {
 		return capacity;
@@ -40,6 +41,7 @@ public class PercentBasedCuckooHash<K> {
 	}
 	
 	public boolean put(K data){
+		incomingElement = data;
 		Node<K> newNode = new Node<K>(data);
 		int key1 = hash1(data);
 		int key2 = hash2(data);
@@ -50,7 +52,8 @@ public class PercentBasedCuckooHash<K> {
 			
 		}else{
 			memory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-			if((size/capacity)*100 > percentFull){
+			if((size/(capacity*2.0))*100 > percentFull){
+				//System.out.println("size:"+size+" capacity:"+capacity);
 				maxLoopsStuck();
 			}
 			if(insertToTableOne(key1, newNode, 0, newNode.data)){
@@ -64,7 +67,10 @@ public class PercentBasedCuckooHash<K> {
 	
 	private boolean insertToTableOne(int key, Node<K> n, int count, K data){
 		if(count > maxRoundLoops){// && data.equals(n.data)){
-			//System.out.println("data:"+data+" key:"+key);
+			int hash = hash1(incomingElement);
+			arr1[hash] = null;
+			size--;
+			put(data);
 			return false;
 		}else if(arr1[key] == null){
 			arr1[key] = n;
@@ -81,7 +87,10 @@ public class PercentBasedCuckooHash<K> {
 	
 	private boolean insertToTableTwo(int key, Node<K> n, int count, K data){
 		if(count > maxRoundLoops){// && data.equals(n.data)){
-			//System.out.println("data:"+data+" key:"+key);
+			int hash = hash2(incomingElement);
+			arr2[hash] = null;
+			size--;
+			put(data);
 			return false;
 		}else if(arr2[key] == null){
 			arr2[key] = n;
@@ -116,7 +125,15 @@ public class PercentBasedCuckooHash<K> {
 	
 	private int  hash1(K data){
 		int key = 0;
-		key = ((data.hashCode() & 0xf7777777)*7 + 29) % (capacity/2);
+		int sum = 0;
+		int PosData = (data.hashCode() & 0xf7777777);
+		for(int i = 0 ; i < percentFull; i++){
+			sum += i^3 + (PosData)*(63*(i%7) + 29*(i%11) + 123*(i%17));
+		}
+		if(sum < 0)
+			sum = sum * -1;
+		//key = ((data.hashCode() & 0xf7777777)*7 + sum) % (capacity);
+		key = sum % capacity;
 		return key;
 	}
 	

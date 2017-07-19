@@ -23,6 +23,7 @@ public class CuckooHash<K> {
 	int append = 0;
 	long memory = 0;
 	long cumelativeMemory = 0;
+	K incomingElement = null;
 	
 	public int getCapacity() {
 		return capacity;
@@ -38,6 +39,7 @@ public class CuckooHash<K> {
 	}
 	
 	public void put(K data){
+		incomingElement = data;
 		Node<K> newNode = new Node<K>(data);
 		int key1 = hash1(data);
 		int key2 = hash2(data);
@@ -58,7 +60,7 @@ public class CuckooHash<K> {
 	
 	private boolean insertToTableOne(int key, Node<K> n, int count, K data){
 		if(count > maxRoundLoops){// && data.equals(n.data)){
-			maxLoopsStuck();
+			maxLoopsStuck(data);
 			return insertToTableOne(hash1(n.data), n, 0, data);
 		}else if(arr1[key] == null){
 			arr1[key] = n;
@@ -78,7 +80,7 @@ public class CuckooHash<K> {
 	
 	private boolean insertToTableTwo(int key, Node<K> n, int count, K data){
 		if(count > maxRoundLoops){// && data.equals(n.data)){
-			maxLoopsStuck();
+			maxLoopsStuck(data);
 			return insertToTableOne(hash1(n.data), n, 0, data);
 		}else if(arr2[key] == null){
 			arr2[key] = n;
@@ -94,7 +96,7 @@ public class CuckooHash<K> {
 		}
 	}
 	
-	private void maxLoopsStuck(){
+	private void maxLoopsStuck(K data){
 		Node<K> temp1[] = arr1;
 		Node<K> temp2[] = arr2;
 		capacity = capacity + numbers[append];
@@ -107,10 +109,19 @@ public class CuckooHash<K> {
 		Arrays.fill(arr1, null);
 		Arrays.fill(arr2, null);
 		for(int i = 0 ; i < temp1.length; i++){
-			if(temp1[i] != null)
-				put(temp1[i].data);
-			if(temp2[i] != null)
-				put(temp2[i].data);
+			if(temp1[i] != null){
+				if(temp1[i].data == incomingElement)
+					put(data);
+				else
+					put(temp1[i].data);
+				
+			}
+			if(temp2[i] != null){
+				if(temp2[i].data == incomingElement)
+					put(data);
+				else
+					put(temp2[i].data);
+			}
 		}
 	}
 	
